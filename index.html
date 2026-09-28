@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResumeForge AI — Modern AI-Powered Resume Builder for College Students & Freshers</title>
+  <meta name="description" content="Create an AI-powered, ATS-friendly resume tailored to the company and role you want to apply for. Designed specifically for college students and freshers.">
+  
+  <!-- Tailwind CSS via official CDN with custom configuration -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+            serif: ['Merriweather', 'serif'],
+            display: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Canvas Confetti for Celebrations -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom CSS with Print rules -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+  <!-- =========================================================================
+       GLOBAL NAVIGATION BAR
+       ========================================================================= -->
+  <header class="sticky top-0 z-40 w-full glass-panel border-b border-slate-200/80 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3 cursor-pointer" id="nav-brand-logo">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-blue-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">ResumeForge<span class="text-slate-900 dark:text-white">AI</span></span>
+          <span class="hidden sm:inline-block ml-2 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+            For Freshers
+          </span>
+        </div>
+      </div>
+
+      <!-- Center Links (Visible on Landing Page) -->
+      <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600 dark:text-slate-300" id="nav-links">
+        <button class="hover:text-indigo-600 dark:hover:text-indigo-400 transition" onclick="app.showLandingSection('features')">Features</button>
+        <button class="hover:text-indigo-600 dark:hover:text-indigo-400 transition" onclick="app.showLandingSection('how-it-works')">How It Works</button>
+        <button class="hover:text-indigo-600 dark:hover:text-indigo-400 transition" onclick="app.showLandingSection('templates')">Templates</button>
+        <button class="hover:text-indigo-600 dark:hover:text-indigo-400 transition" onclick="app.openScoreModal()">ATS Checker</button>
+      </nav>
+
+      <!-- Right Controls -->
+      <div class="flex items-center gap-3">
+        <!-- Quick Demo Fill Button -->
+        <button id="btn-load-demo-data" title="Load realistic sample student profile" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/50 dark:hover:bg-indigo-900/50 rounded-lg border border-indigo-200 dark:border-indigo-800 transition">
+          <i data-lucide="sparkle" class="w-3.5 h-3.5"></i>
+          <span>Sample Student</span>
+        </button>
+
+        <!-- Dark / Light Mode Toggle -->
+        <button id="btn-theme-toggle" class="p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Toggle theme">
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+          <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+        </button>
+
+        <!-- Builder / Dashboard Switcher -->
+        <div id="nav-auth-container" class="flex items-center gap-2">
+          <!-- Injected via JavaScript based on current view/auth state -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       MAIN VIEW CONTAINER (Landing Page, Dashboard, or Resume Builder)
+       ========================================================================= -->
+  <main class="flex-1 flex flex-col relative" id="app-viewport">
+    
+    <!-- VIEW 1: LANDING PAGE -->
+    <div id="view-landing" class="view-screen">
+      <!-- Hero Section -->
+      <section class="relative pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden">
+        <div class="hero-glow"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          
+          <!-- Announcement Pill -->
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold text-indigo-700 dark:text-indigo-300 mb-6 shadow-sm">
+            <span class="flex h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
+            Zero-Experience? No Problem. Built for College Freshers & Interns
+          </div>
+
+          <!-- Hero Heading -->
+          <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl mx-auto leading-tight md:leading-tight">
+            Build a Resume That <br class="hidden sm:inline" />
+            <span class="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">Gets Noticed.</span>
+          </h1>
+
+          <!-- Subheading -->
+          <p class="mt-6 text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
+            Create an AI-powered, ATS-friendly resume tailored to the company and role you want to apply for. Turn academic projects and college coursework into recruiter-ready accomplishments.
+          </p>
+
+          <!-- CTAs -->
+          <div class="mt-9 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button id="hero-btn-build" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-base shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-2.5">
+              <span>Build My Resume</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+            <button id="hero-btn-how" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 font-semibold text-base border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition flex items-center justify-center gap-2">
+              <i data-lucide="play-circle" class="w-4 h-4 text-indigo-500"></i>
+              <span>See How It Works</span>
+            </button>
+          </div>
+
+          <!-- Target Companies Pill Bar -->
+          <div class="mt-14 pt-8 border-t border-slate-200/60 dark:border-slate-800/80">
+            <p class="text-xs uppercase font-bold tracking-widest text-slate-600 dark:text-slate-300">
+              Tailored for top tech companies & fresher campus drives
+            </p>
+            <div class="mt-4 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-sm font-semibold text-slate-600 dark:text-slate-300">
+              <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i> Google SDE</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i> Microsoft New Grad</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i> Amazon Intern</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i> Infosys Specialist</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i> TCS Digital</span>
+            </div>
+          </div>
+
+          <!-- Interactive Before & After AI Transformation Preview -->
+          <div class="mt-14 max-w-4xl mx-auto rounded-2xl p-6 glass-panel text-left shadow-2xl relative">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-400"></span>
+                <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+                <span class="w-3 h-3 rounded-full bg-green-400"></span>
+                <span class="ml-2 text-xs font-mono text-slate-600 dark:text-slate-300 font-semibold">AI Tailoring Engine — Real Example</span>
+              </div>
+              <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg text-xs font-medium">
+                <button id="toggle-preview-before" class="px-3 py-1 rounded-md text-slate-500 hover:text-slate-900 dark:text-slate-400 transition">Raw Student Input</button>
+                <button id="toggle-preview-after" class="px-3 py-1 rounded-md bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm font-semibold transition">AI-Enhanced & Tailored</button>
+              </div>
+            </div>
+
+            <!-- Before Content -->
+            <div id="preview-content-before" class="mt-5 hidden space-y-4">
+              <div class="bg-red-50/50 dark:bg-red-950/20 p-4 rounded-xl border border-red-200/60 dark:border-red-900/40">
+                <span class="text-xs uppercase font-bold text-red-700 dark:text-red-400">Raw Project Bullet (Passable, but weak impact)</span>
+                <p class="text-sm text-slate-700 dark:text-slate-300 mt-1 font-mono">"Made a website using React for farmers to sell their vegetables online without middlemen."</p>
+              </div>
+              <div class="text-xs text-slate-500 flex items-center gap-2">
+                <i data-lucide="alert-circle" class="w-4 h-4 text-amber-500"></i>
+                Lacks quantifiable outcome, action verbs, and ATS keywords.
+              </div>
+            </div>
+
+            <!-- After Content -->
+            <div id="preview-content-after" class="mt-5 space-y-4">
+              <div class="bg-emerald-50/60 dark:bg-emerald-950/20 p-4 rounded-xl border border-emerald-200/60 dark:border-emerald-900/40">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs uppercase font-bold text-emerald-700 dark:text-emerald-400">AI Tailored for Google — Software Engineer</span>
+                  <span class="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/50 px-2 py-0.5 rounded-full">ATS Score +32%</span>
+                </div>
+                <p class="text-sm text-slate-800 dark:text-slate-200 mt-1.5 font-medium leading-relaxed">
+                  "Architected a responsive React-based digital marketplace connecting 500+ agricultural suppliers directly with consumers; designed optimized state management and RESTful APIs, reducing transaction friction by 35%."
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2">
+                <span class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
+                  <i data-lucide="check" class="w-4 h-4"></i> Action verb ("Architected")
+                </span>
+                <span class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
+                  <i data-lucide="check" class="w-4 h-4"></i> Quantifiable impact ("500+ users, 35%")
+                </span>
+                <span class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
+                  <i data-lucide="shield-check" class="w-4 h-4"></i> Zero hallucination / Grounded in actual facts
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- "How It Works" 5-Step Section -->
+      <section id="how-it-works" class="py-20 bg-slate-100/70 dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <span class="text-xs uppercase font-bold tracking-widest text-indigo-600 dark:text-indigo-400">Step-by-Step Workflow</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">How ResumeForge AI Works</h2>
+          <p class="mt-3 text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
+            Turn your college coursework, projects, and certifications into a polished, ATS-optimized resume in five simple steps.
+          </p>
+
+          <div class="mt-14 grid grid-cols-1 md:grid-cols-5 gap-6">
+            <!-- Step 1 -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 shadow-sm text-left relative flex flex-col justify-between">
+              <div>
+                <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-lg mb-4">
+                  1
+                </div>
+                <h3 class="font-bold text-base text-slate-900 dark:text-white">Enter Your Details</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                  Input personal links (GitHub, LinkedIn), college education, CGPA, projects, certifications, and skills.
+                </p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/50 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                <i data-lucide="user-check" class="w-3.5 h-3.5"></i> Multi-step form
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 shadow-sm text-left relative flex flex-col justify-between">
+              <div>
+                <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-lg mb-4">
+                  2
+                </div>
+                <h3 class="font-bold text-base text-slate-900 dark:text-white">Choose Target Role</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                  Select your target company (Google, Microsoft, Amazon, Infosys) and job role, or paste the job description.
+                </p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/50 text-[11px] font-semibold text-purple-600 dark:text-purple-400 flex items-center gap-1">
+                <i data-lucide="target" class="w-3.5 h-3.5"></i> Role tailoring
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 shadow-sm text-left relative flex flex-col justify-between">
+              <div>
+                <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-lg mb-4">
+                  3
+                </div>
+                <h3 class="font-bold text-base text-slate-900 dark:text-white">Let AI Analyze</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                  The AI identifies matched skills, gap areas to learn, keywords, and action-verb improvements.
+                </p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/50 text-[11px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                <i data-lucide="cpu" class="w-3.5 h-3.5"></i> ATS analysis
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 shadow-sm text-left relative flex flex-col justify-between">
+              <div>
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-lg mb-4">
+                  4
+                </div>
+                <h3 class="font-bold text-base text-slate-900 dark:text-white">Get Tailored Resume</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                  Switch between 6 professional templates, customize fonts, colors, and review the live preview in real time.
+                </p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/50 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <i data-lucide="palette" class="w-3.5 h-3.5"></i> 6 templates
+              </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 shadow-sm text-left relative flex flex-col justify-between">
+              <div>
+                <div class="w-10 h-10 rounded-xl bg-pink-100 dark:bg-pink-900/50 text-pink-600 dark:text-pink-400 flex items-center justify-center font-bold text-lg mb-4">
+                  5
+                </div>
+                <h3 class="font-bold text-base text-slate-900 dark:text-white">Download & Apply</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                  Download crisp ATS-friendly PDF or DOCX files, perfectly formatted for online company portals.
+                </p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/50 text-[11px] font-semibold text-pink-600 dark:text-pink-400 flex items-center gap-1">
+                <i data-lucide="file-down" class="w-3.5 h-3.5"></i> PDF & DOCX
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature Cards Section -->
+      <section id="features" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+          <span class="text-xs uppercase font-bold tracking-widest text-indigo-600 dark:text-indigo-400">Everything You Need</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mt-2">Engineered for Student Success</h2>
+          <p class="mt-3 text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
+            Built from the ground up to solve the real challenges college students face when breaking into tech.
+          </p>
+        </div>
+
+        <div class="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Card 1 -->
+          <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+            <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4">
+              <i data-lucide="sparkles" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">AI-Powered Generation</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+              Generates compelling professional summaries and elevates your genuine projects with action verbs.
+            </p>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+            <div class="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-4">
+              <i data-lucide="building-2" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">Company & Role Tailoring</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+              Dynamically aligns phrasing and emphasis with specific hiring expectations at Google, Microsoft, and startups.
+            </p>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4">
+              <i data-lucide="file-check" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">ATS Optimization</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+              Standard header tags and single-column scan compatibility ensure parsing software never rejects your resume.
+            </p>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+            <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-4">
+              <i data-lucide="lightbulb" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">Skill Suggestions</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+              Identifies role-relevant technologies you should consider highlighting or learning for technical interviews.
+            </p>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+            <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4">
+              <i data-lucide="layers" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">13 Professional Templates</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+              Featuring Zety favorites (Cascade, Primo, Cubic, Diamond) plus College Fresher, SWE, and Classic ATS.
+            </p>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+            <div class="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-4">
+              <i data-lucide="gauge" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">Resume Score Breakdown</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+              Detailed breakdown across ATS Compatibility, Skills Relevance, Project Relevance, and Keyword Optimization.
+            </p>
+          </div>
+
+          <!-- Card 7 -->
+          <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+            <div class="w-12 h-12 rounded-xl bg-cyan-50 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mb-4">
+              <i data-lucide="bot" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">AI Assistant Chat</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+              Ask questions about your resume, request phrasing improvements, and get instant tailored feedback.
+            </p>
+          </div>
+
+          <!-- Card 8 -->
+          <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition">
+            <div class="w-12 h-12 rounded-xl bg-violet-50 dark:bg-violet-950 text-violet-600 dark:text-violet-400 flex items-center justify-center mb-4">
+              <i data-lucide="download" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">PDF & DOCX Download</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+              Pixel-perfect A4 PDF generation and structured Word document export preserving your typography.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Template Showcase Section -->
+      <section id="templates" class="py-20 bg-slate-100/70 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 text-xs font-semibold mb-3 border border-indigo-200 dark:border-indigo-800">
+            ⭐ 13 Professional Designs Including Zety Favorites
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">World-Class Resume Templates</h2>
+          <p class="mt-3 text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
+            Switch between templates instantly with one click. Your entered information is preserved across every design.
+          </p>
+
+          <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+            <!-- Template 1: Zety Cascade -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 dark:bg-indigo-950 px-2.5 py-1 rounded-full">Zety #1 Most Popular</span>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-3">Cascade</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  The world's most popular two-column resume design with a shaded left sidebar, skills badges, and crisp visual hierarchy.
+                </p>
+              </div>
+              <button class="mt-6 w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition shadow-sm" onclick="app.openBuilderWithTemplate('cascade')">
+                Use Cascade Template →
+              </button>
+            </div>
+
+            <!-- Template 2: Zety Primo -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 dark:bg-purple-950 px-2.5 py-1 rounded-full">Timeline Storyteller</span>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-3">Primo</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  Features a modern vertical timeline spine with circular milestone nodes and an initials monogram avatar badge.
+                </p>
+              </div>
+              <button class="mt-6 w-full py-2.5 rounded-xl bg-slate-100 hover:bg-purple-50 text-purple-600 font-semibold text-xs transition" onclick="app.openBuilderWithTemplate('primo')">
+                Use Primo Template →
+              </button>
+            </div>
+
+            <!-- Template 3: Zety Cubic -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 dark:bg-blue-950 px-2.5 py-1 rounded-full">Geometric Block</span>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-3">Cubic</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  High-contrast modern geometric design with an accent color header block and organized two-column layout.
+                </p>
+              </div>
+              <button class="mt-6 w-full py-2.5 rounded-xl bg-slate-100 hover:bg-blue-50 text-blue-600 font-semibold text-xs transition" onclick="app.openBuilderWithTemplate('cubic')">
+                Use Cubic Template →
+              </button>
+            </div>
+
+            <!-- Template 4: Zety Diamond -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-rose-700 bg-rose-50 dark:bg-rose-950 px-2.5 py-1 rounded-full">Executive Polish</span>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-3">Diamond</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  Distinguished diamond bullet points (◆), dark accent bar, and sleek double horizontal dividers.
+                </p>
+              </div>
+              <button class="mt-6 w-full py-2.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-rose-600 font-semibold text-xs transition" onclick="app.openBuilderWithTemplate('diamond')">
+                Use Diamond Template →
+              </button>
+            </div>
+
+            <!-- Template 5: College Fresher -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 dark:bg-emerald-950 px-2.5 py-1 rounded-full">Best for College Students</span>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-3">College Fresher</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  Places Education, CGPA, and Projects at the top, ensuring recruiters evaluate your academic grit and coding ability first.
+                </p>
+              </div>
+              <button class="mt-6 w-full py-2.5 rounded-xl bg-slate-100 hover:bg-emerald-50 text-emerald-600 font-semibold text-xs transition" onclick="app.openBuilderWithTemplate('fresher')">
+                Use Fresher Template →
+              </button>
+            </div>
+
+            <!-- Template 6: Software Engineer -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 bg-slate-100 dark:bg-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-full">Tech & GitHub Focused</span>
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-3">Software Engineer</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  Technical skills upfront, prominent GitHub and live-demo links, and technical project bullet points.
+                </p>
+              </div>
+              <button class="mt-6 w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs transition" onclick="app.openBuilderWithTemplate('swe')">
+                Use SWE Template →
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Trust & Anti-Fabrication Guarantee -->
+      <section class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 text-white shadow-xl relative overflow-hidden">
+          <div class="relative z-10 max-w-3xl mx-auto">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold text-indigo-200 mb-4 border border-white/15">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i> Strict Ethics & Privacy Guarantee
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-bold">The Zero-Fabrication Pledge</h2>
+            <p class="mt-3 text-sm sm:text-base text-indigo-100 leading-relaxed font-light">
+              Unlike generic AI tools that invent fake work experience or fake certifications, ResumeForge AI only refines, structures, and elevates what you actually built. We never lie to recruiters.
+            </p>
+            <div class="mt-8 flex justify-center">
+              <button class="px-8 py-3.5 rounded-xl bg-white text-indigo-900 font-bold text-sm hover:bg-indigo-50 shadow-lg transition" onclick="app.openBuilder()">
+                Start Building Your Resume — It's Free
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- VIEW 2: STUDENT DASHBOARD -->
+    <div id="view-dashboard" class="view-screen hidden flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+      <!-- Welcome Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800 gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white" id="dashboard-welcome-heading">Welcome, Alex Chen 👋</h1>
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">Manage your tailored resumes, track ATS scores, and target company applications.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button id="dashboard-btn-create-new" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-md shadow-indigo-500/20 transition flex items-center gap-2">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Create New Resume</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Cards -->
+      <div class="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">My Resumes</div>
+          <div class="mt-2 text-2xl font-black text-slate-900 dark:text-white" id="dash-metric-resumes">3</div>
+          <div class="text-[11px] text-emerald-600 font-medium mt-1">2 Tailored with AI</div>
+        </div>
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Avg ATS Score</div>
+          <div class="mt-2 text-2xl font-black text-indigo-600 dark:text-indigo-400" id="dash-metric-score">88/100</div>
+          <div class="text-[11px] text-indigo-600 font-medium mt-1">Top 5% for Freshers</div>
+        </div>
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Target Companies</div>
+          <div class="mt-2 text-2xl font-black text-purple-600 dark:text-purple-400">Google, MSFT</div>
+          <div class="text-[11px] text-purple-600 font-medium mt-1">Software Engineer roles</div>
+        </div>
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Active Applications</div>
+          <div class="mt-2 text-2xl font-black text-emerald-600 dark:text-emerald-400">4</div>
+          <div class="text-[11px] text-slate-600 font-medium mt-1">1 Interview scheduled</div>
+        </div>
+      </div>
+
+      <!-- Resumes List -->
+      <div class="mt-8">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white">Your Saved Resumes</h2>
+          <span class="text-xs text-slate-500">Auto-saved in browser storage</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="dashboard-resumes-grid">
+          <!-- Dynamically populated by app.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: SPLIT-SCREEN RESUME BUILDER -->
+    <div id="view-builder" class="view-screen hidden flex-1 flex flex-col h-[calc(100vh-64px)] overflow-hidden">
+      <!-- Builder Sub-Header -->
+      <div class="h-14 px-4 sm:px-6 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <button id="builder-btn-back" class="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Back to Dashboard">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          </button>
+          <div>
+            <span class="text-sm font-bold text-slate-900 dark:text-white" id="builder-resume-title">Google — SDE Intern Resume</span>
+            <span class="hidden sm:inline-block ml-2 text-[10px] font-semibold text-emerald-700 bg-emerald-50 dark:bg-emerald-950 dark:text-emerald-400 px-2 py-0.5 rounded">
+              ATS Score: <span id="builder-top-score">88/100</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Mode Switcher Pill (Form Mode vs Workspace Mode) -->
+        <div class="hidden sm:flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+          <button id="btn-mode-form" class="px-3 py-1 rounded-lg transition flex items-center gap-1.5 bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm" onclick="app.setBuilderMode('form')">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            <span>1. Edit Inputs</span>
+          </button>
+          <button id="btn-mode-workspace" class="px-3 py-1 rounded-lg transition flex items-center gap-1.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-white" onclick="app.setBuilderMode('workspace')">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-500"></i>
+            <span>2. Resume & AI Workspace</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          </button>
+        </div>
+
+        <!-- AI Action Buttons -->
+        <div class="flex items-center gap-2">
+          <button id="btn-quick-ai-tailor" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs shadow-md shadow-indigo-500/25 flex items-center gap-1.5 transition" onclick="app.runAITailoringFlow()">
+            <i data-lucide="zap" class="w-3.5 h-3.5 text-yellow-300"></i>
+            <span>Build Resume</span>
+          </button>
+          <button id="btn-quick-ai-score" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-slate-700 transition flex items-center gap-1.5">
+            <i data-lucide="gauge" class="w-3.5 h-3.5 text-indigo-500"></i>
+            <span class="hidden md:inline">Score & Gaps</span>
+          </button>
+          <button id="btn-download-pdf-top" class="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-semibold text-xs hover:bg-indigo-100 transition flex items-center gap-1">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">Export</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- =======================================================================
+           LAYOUT 1: STEP-BY-STEP INPUT FORM MODE (Default before Build Resume)
+           ======================================================================= -->
+      <div id="builder-form-layout" class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- LEFT COLUMN: Multi-Step Student Form -->
+        <div class="w-full lg:w-1/2 flex flex-col border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 overflow-y-auto">
+          
+          <!-- Stepper Pills Navigation (Steps 1 to 9) -->
+          <div class="sticky top-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 p-3 overflow-x-auto">
+            <div class="flex items-center gap-2 min-w-max" id="stepper-pills-container">
+              <!-- Dynamically populated by app.js (Steps 1 to 9) -->
+            </div>
+          </div>
+
+          <!-- Step Form Container -->
+          <div class="p-5 sm:p-7 space-y-6 flex-1" id="form-step-content">
+            <!-- Dynamically populated per current step -->
+          </div>
+
+          <!-- Form Navigation Footer -->
+          <div class="sticky bottom-0 z-20 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between shrink-0">
+            <button id="btn-step-prev" class="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition disabled:opacity-40">
+              ← Previous
+            </button>
+            <div class="text-xs text-slate-500 font-medium">
+              Step <span id="current-step-num">1</span> of 9
+            </div>
+            <button id="btn-step-next" class="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition">
+              Next Step →
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Live Interactive Resume Preview & Customization (Form Mode) -->
+        <div class="w-full lg:w-1/2 flex flex-col bg-slate-200/80 dark:bg-slate-950 overflow-hidden relative">
+          
+          <!-- Live Preview Control Bar -->
+          <div class="h-12 px-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0 text-xs overflow-x-auto gap-2">
+            <!-- Template Switcher -->
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="text-slate-500 font-medium">Template:</span>
+              <select id="select-template" class="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                <optgroup label="⭐ Zety Signature Designs">
+                  <option value="cascade" selected>Cascade (Zety #1 Popular)</option>
+                  <option value="primo">Primo (Timeline Spine)</option>
+                  <option value="cubic">Cubic (Geometric Header)</option>
+                  <option value="diamond">Diamond (Corporate Bullets)</option>
+                  <option value="concept">Concept (Milestone Years)</option>
+                  <option value="vibes">Vibes (Creative & Icons)</option>
+                  <option value="crisp">Crisp (Executive Clean)</option>
+                </optgroup>
+                <optgroup label="🎓 College & Fresher Designs">
+                  <option value="fresher">College Fresher (Projects First)</option>
+                  <option value="swe">Software Engineer (Tech Upfront)</option>
+                  <option value="classic">Classic ATS (Single-Column)</option>
+                  <option value="modern">Modern Professional (Sidebar)</option>
+                  <option value="minimal">Minimal Clean</option>
+                  <option value="internship">Internship Seeker</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <!-- Font Family -->
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="text-slate-500 font-medium">Font:</span>
+              <select id="select-font" class="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-medium text-slate-800 dark:text-slate-200 focus:outline-none">
+                <option value="Inter">Inter</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="JetBrains Mono">JetBrains Mono</option>
+                <option value="Outfit">Outfit</option>
+              </select>
+            </div>
+
+            <!-- Color Palette Picker -->
+            <div class="flex items-center gap-1 shrink-0">
+              <button class="w-4 h-4 rounded-full bg-indigo-600 ring-2 ring-offset-1 ring-indigo-500" data-color="#4f46e5" title="Indigo"></button>
+              <button class="w-4 h-4 rounded-full bg-blue-600 hover:scale-110" data-color="#2563eb" title="Royal Blue"></button>
+              <button class="w-4 h-4 rounded-full bg-emerald-600 hover:scale-110" data-color="#059669" title="Emerald"></button>
+              <button class="w-4 h-4 rounded-full bg-purple-600 hover:scale-110" data-color="#7c3aed" title="Purple"></button>
+              <button class="w-4 h-4 rounded-full bg-rose-600 hover:scale-110" data-color="#e11d48" title="Rose"></button>
+              <button class="w-4 h-4 rounded-full bg-slate-900 hover:scale-110" data-color="#0f172a" title="Charcoal"></button>
+            </div>
+
+            <!-- Export Buttons -->
+            <div class="flex items-center gap-1.5 shrink-0 ml-auto">
+              <button id="btn-download-pdf" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center gap-1 shadow-sm transition" title="Print to PDF (High Resolution)">
+                <i data-lucide="printer" class="w-3 h-3"></i>
+                <span>PDF</span>
+              </button>
+              <button id="btn-download-docx" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold flex items-center gap-1 transition" title="Export as Word DOCX">
+                <i data-lucide="file-text" class="w-3 h-3"></i>
+                <span>DOCX</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Document Canvas Container -->
+          <div class="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center items-start">
+            <div id="resume-live-preview" class="a4-preview-container">
+              <!-- Live template rendered here by templates.js & app.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =======================================================================
+           LAYOUT 2: WORKSPACE MODE (RESUME ON LEFT, AI UPSKILLING ON RIGHT)
+           ======================================================================= -->
+      <div id="builder-workspace-layout" class="hidden flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- LEFT COLUMN: Live Tailored Resume Preview & Direct Controls -->
+        <div class="w-full lg:w-1/2 flex flex-col bg-slate-200/80 dark:bg-slate-950 overflow-hidden border-r border-slate-200 dark:border-slate-800 relative">
+          
+          <!-- Workspace Left Control Bar -->
+          <div class="h-12 px-3 sm:px-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0 text-xs overflow-x-auto gap-2">
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button class="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-semibold flex items-center gap-1 hover:bg-indigo-100 transition" onclick="app.setBuilderMode('form')">
+                <i data-lucide="pencil" class="w-3 h-3"></i>
+                <span>Edit Inputs</span>
+              </button>
+              <span class="text-slate-300 dark:text-slate-700">|</span>
+              <span class="text-slate-500 font-medium">Template:</span>
+              <select id="select-template-workspace" class="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-semibold text-slate-800 dark:text-slate-200 focus:outline-none">
+                <optgroup label="⭐ Zety Signature Designs">
+                  <option value="cascade" selected>Cascade (Zety #1)</option>
+                  <option value="primo">Primo (Timeline)</option>
+                  <option value="cubic">Cubic (Modern)</option>
+                  <option value="diamond">Diamond (Corporate)</option>
+                  <option value="concept">Concept (Milestones)</option>
+                  <option value="vibes">Vibes (Creative)</option>
+                  <option value="crisp">Crisp (Clean)</option>
+                </optgroup>
+                <optgroup label="🎓 College & Fresher">
+                  <option value="fresher">College Fresher</option>
+                  <option value="swe">Software Engineer</option>
+                  <option value="classic">Classic ATS</option>
+                  <option value="modern">Modern Pro</option>
+                  <option value="minimal">Minimal Clean</option>
+                  <option value="internship">Internship Seeker</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <!-- Workspace Font & Colors -->
+            <div class="flex items-center gap-2 shrink-0">
+              <select id="select-font-workspace" class="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-medium text-slate-800 dark:text-slate-200 focus:outline-none">
+                <option value="Inter">Inter</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="JetBrains Mono">JetBrains Mono</option>
+                <option value="Outfit">Outfit</option>
+              </select>
+              <div class="hidden sm:flex items-center gap-1 shrink-0">
+                <button class="w-3.5 h-3.5 rounded-full bg-indigo-600 ring-2 ring-offset-1 ring-indigo-500" data-workspace-color="#4f46e5" title="Indigo"></button>
+                <button class="w-3.5 h-3.5 rounded-full bg-blue-600 hover:scale-110" data-workspace-color="#2563eb" title="Royal Blue"></button>
+                <button class="w-3.5 h-3.5 rounded-full bg-emerald-600 hover:scale-110" data-workspace-color="#059669" title="Emerald"></button>
+                <button class="w-3.5 h-3.5 rounded-full bg-purple-600 hover:scale-110" data-workspace-color="#7c3aed" title="Purple"></button>
+                <button class="w-3.5 h-3.5 rounded-full bg-rose-600 hover:scale-110" data-workspace-color="#e11d48" title="Rose"></button>
+                <button class="w-3.5 h-3.5 rounded-full bg-slate-900 hover:scale-110" data-workspace-color="#0f172a" title="Charcoal"></button>
+              </div>
+            </div>
+
+            <!-- Workspace Exports -->
+            <div class="flex items-center gap-1.5 shrink-0 ml-auto">
+              <button id="btn-download-pdf-workspace" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center gap-1 shadow-sm transition" title="Print to PDF">
+                <i data-lucide="printer" class="w-3 h-3"></i>
+                <span>PDF</span>
+              </button>
+              <button id="btn-download-docx-workspace" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold flex items-center gap-1 transition" title="Export as Word DOCX">
+                <i data-lucide="file-text" class="w-3 h-3"></i>
+                <span>DOCX</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Document Canvas (LEFT SIDE) -->
+          <div class="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center items-start">
+            <div id="workspace-resume-preview" class="a4-preview-container">
+              <!-- Rendered tailored template -->
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: AI Features & Upskilling Command Center -->
+        <div class="w-full lg:w-1/2 flex flex-col bg-white dark:bg-slate-900 overflow-hidden">
+          
+          <!-- AI Header Banner -->
+          <div class="p-4 bg-gradient-to-r from-indigo-50 via-purple-50 to-blue-50 dark:from-indigo-950/70 dark:via-purple-950/50 dark:to-slate-900 border-b border-indigo-100 dark:border-indigo-900/50 flex flex-wrap items-center justify-between gap-3 shrink-0">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 bg-white dark:bg-slate-800 px-2.5 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800 flex items-center gap-1">
+                  <i data-lucide="sparkles" class="w-3 h-3 text-indigo-500"></i> AI Role Optimization
+                </span>
+                <span id="workspace-candidate-type-badge" class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/70 dark:text-emerald-400 px-2 py-0.5 rounded-full">College Student • 0 Years Exp</span>
+              </div>
+              <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white mt-1">
+                Targeting <span id="workspace-ai-target-role" class="text-slate-900 dark:text-white">Associate Software Engineer</span> at <span id="workspace-ai-target-company" class="text-indigo-600 dark:text-indigo-400 font-black">Google</span>
+              </h3>
+            </div>
+
+            <!-- Overall Score Pill -->
+            <div class="flex items-center gap-2 bg-white dark:bg-slate-800 p-2 rounded-2xl border border-indigo-100 dark:border-indigo-900/60 shadow-sm shrink-0">
+              <div class="relative w-10 h-10 flex items-center justify-center shrink-0">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                  <path class="text-slate-200 dark:text-slate-700" stroke-width="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path id="workspace-score-ring" class="text-indigo-600 dark:text-indigo-400 transition-all duration-700" stroke-dasharray="88, 100" stroke-width="4" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <span id="workspace-score-number" class="absolute text-xs font-black text-slate-900 dark:text-white">88</span>
+              </div>
+              <div class="pr-1">
+                <div class="text-[9px] uppercase font-bold text-slate-400">ATS Match</div>
+                <div id="workspace-score-label" class="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">Strong Fit</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive AI Tabs Bar -->
+          <div class="px-3 sm:px-4 pt-2 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center gap-2 overflow-x-auto shrink-0 text-xs font-semibold">
+            <button id="tab-btn-upskill" class="workspace-ai-tab pb-2.5 px-3 border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 transition shrink-0" onclick="app.setWorkspaceAITab('upskill')">
+              <i data-lucide="rocket" class="w-3.5 h-3.5"></i>
+              <span>🚀 What More Can I Upskill Myself?</span>
+            </button>
+            <button id="tab-btn-score" class="workspace-ai-tab pb-2.5 px-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1.5 transition shrink-0" onclick="app.setWorkspaceAITab('score')">
+              <i data-lucide="gauge" class="w-3.5 h-3.5"></i>
+              <span>📊 ATS Score & Fit</span>
+            </button>
+            <button id="tab-btn-improvements" class="workspace-ai-tab pb-2.5 px-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1.5 transition shrink-0" onclick="app.setWorkspaceAITab('improvements')">
+              <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
+              <span>🪄 AI Improvements</span>
+            </button>
+            <button id="tab-btn-chat" class="workspace-ai-tab pb-2.5 px-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1.5 transition shrink-0" onclick="app.setWorkspaceAITab('chat')">
+              <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+              <span>💬 AI Assistant</span>
+            </button>
+          </div>
+
+          <!-- Tab Content Scrollable Container (RIGHT SIDE) -->
+          <div id="workspace-ai-tab-body" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+            <!-- Dynamically populated by app.renderWorkspaceAI() -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       MODAL 1: AI PROFILE ANALYSIS & ATS SCORE MODAL
+       ========================================================================= -->
+  <div id="modal-ai-score" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <span class="text-xs uppercase font-bold tracking-widest text-indigo-600 dark:text-indigo-400">Target Role Fit Analysis</span>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-0.5">Why This Resume Fits Your Role</h2>
+        </div>
+        <button id="btn-close-score-modal" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Score Ring & Overview -->
+      <div class="mt-6 flex flex-col sm:flex-row items-center gap-6 p-5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/40">
+        <div class="relative w-28 h-28 flex items-center justify-center shrink-0">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+            <path class="text-slate-200 dark:text-slate-700" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path class="text-indigo-600 dark:text-indigo-400" stroke-dasharray="88, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          </svg>
+          <div class="absolute flex flex-col items-center">
+            <span class="text-2xl font-black text-slate-900 dark:text-white" id="modal-score-number">88</span>
+            <span class="text-[10px] uppercase font-bold text-slate-500">out of 100</span>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-bold text-base text-slate-900 dark:text-white">Target Fit: <span id="modal-target-company-role" class="text-indigo-600 dark:text-indigo-400">Google — Software Engineer</span></h3>
+          <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed" id="modal-score-summary">
+            Your technical foundations and full-stack projects match 86% of the core competencies expected for this entry-level engineering role.
+          </p>
+        </div>
+      </div>
+
+      <!-- 6 Metrics Breakdown -->
+      <div class="mt-6">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Score Breakdown</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs" id="modal-metrics-container">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Skills Match & Potential Gaps -->
+      <div class="mt-6 space-y-4">
+        <!-- Matched Skills -->
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+          <div class="text-xs font-bold uppercase text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5 mb-2">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            <span>Matched Skills in Your Resume</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5" id="modal-matched-skills">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Potential Skill Gaps (Clearly marked as suggestions) -->
+        <div class="p-4 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40">
+          <div class="text-xs font-bold uppercase text-amber-800 dark:text-amber-400 flex items-center gap-1.5 mb-1">
+            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+            <span>Potential Gaps to Consider Learning</span>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
+            These skills are commonly asked for this position. Consider brushing up on them for your technical interviews or adding them if you already have project exposure.
+          </p>
+          <div class="flex flex-wrap gap-1.5" id="modal-skill-gaps">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Actionable Suggestions -->
+      <div class="mt-6">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Actionable AI Suggestions</h4>
+        <div class="space-y-2.5" id="modal-suggestions-list">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 2: AI SCANNING & PROCESSING ANIMATION MODAL
+       ========================================================================= -->
+  <div id="modal-ai-loading" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-8 text-center shadow-2xl border border-slate-200 dark:border-slate-800 relative overflow-hidden">
+      <!-- Top Scanner Bar -->
+      <div class="ai-scan-bar"></div>
+
+      <div class="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-4 animate-pulse">
+        <i data-lucide="cpu" class="w-8 h-8"></i>
+      </div>
+      <h3 class="text-xl font-bold text-slate-900 dark:text-white">Analyzing Your Profile...</h3>
+      <p class="text-xs text-slate-500 mt-1" id="loading-subtext">Evaluating skills, ATS compatibility, and role keywords...</p>
+
+      <!-- Animated Progress Steps -->
+      <div class="mt-6 space-y-2.5 text-left text-xs font-medium" id="loading-steps-list">
+        <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400" id="l-step-1">
+          <i data-lucide="check-circle" class="w-4 h-4"></i>
+          <span>Matching technical skills against job role...</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-400" id="l-step-2">
+          <i data-lucide="loader" class="w-4 h-4 animate-spin"></i>
+          <span>Extracting keywords from target company profile...</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-400" id="l-step-3">
+          <i data-lucide="circle" class="w-4 h-4"></i>
+          <span>Rewriting project descriptions with action verbs...</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-400" id="l-step-4">
+          <i data-lucide="circle" class="w-4 h-4"></i>
+          <span>Assembling ATS-optimized layout...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 3: AUTHENTICATION MODAL (Sign In / Sign Up / Demo Account)
+       ========================================================================= -->
+  <div id="modal-auth" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
+      
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white" id="auth-modal-title">Sign In to ResumeForge</h3>
+          <p class="text-xs text-slate-500 mt-1">Access your saved resumes and tailored applications</p>
+        </div>
+        <button id="btn-close-auth-modal" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Quick 1-Click Demo Login Button -->
+      <div class="mb-5 p-3.5 rounded-xl bg-indigo-50/80 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 text-center">
+        <span class="text-[11px] font-bold text-indigo-700 dark:text-indigo-300 block mb-1.5">⚡ Instant Demo Evaluation</span>
+        <button id="btn-auth-demo-login" class="w-full py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition shadow-sm">
+          Login as Alex Chen (CS Senior Demo)
+        </button>
+      </div>
+
+      <div class="relative my-4">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200 dark:border-slate-800"></div></div>
+        <div class="relative flex justify-center text-xs uppercase"><span class="bg-white dark:bg-slate-900 px-2 text-slate-400 font-semibold">Or email</span></div>
+      </div>
+
+      <!-- Form Inputs -->
+      <form id="form-auth" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
+          <input type="email" id="auth-email" required placeholder="alex@university.edu" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Password</label>
+          <input type="password" id="auth-password" required placeholder="••••••••" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs transition mt-2">
+          Continue with Email
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 4: PRIVACY POLICY & TERMS MODAL
+       ========================================================================= -->
+  <div id="modal-legal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[85vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-4 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Privacy Policy & Terms of Service</h3>
+        <button id="btn-close-legal-modal" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="mt-4 space-y-4 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h4 class="font-bold text-sm text-slate-900 dark:text-white">1. Data Ownership & Protection</h4>
+        <p>Your resume data belongs solely to you. We do not sell, rent, or share candidate profiles, contact information, or academic records with third-party data brokers.</p>
+
+        <h4 class="font-bold text-sm text-slate-900 dark:text-white">2. Zero Fabrication Ethics</h4>
+        <p>ResumeForge AI strictly enforces authentic representation. Our AI engine is programmed to never invent fraudulent work experience, fake credentials, or false metrics. Users remain responsible for the accuracy of information submitted on their applications.</p>
+
+        <h4 class="font-bold text-sm text-slate-900 dark:text-white">3. Secure API Architecture</h4>
+        <p>All AI enhancements and LLM calls are processed through encrypted, authenticated backend endpoints. Client API keys are never exposed in browser source code.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       FLOATING RESUME AI ASSISTANT CHAT DRAWER
+       ========================================================================= -->
+  <!-- Floating Launcher Button -->
+  <button id="btn-toggle-assistant" class="fixed bottom-6 right-6 z-40 px-4 py-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-xs shadow-xl shadow-indigo-500/30 hover:scale-105 active:scale-95 transition flex items-center gap-2">
+    <i data-lucide="bot" class="w-4 h-4"></i>
+    <span>Resume AI Assistant</span>
+  </button>
+
+  <!-- Slide-Out Chat Drawer -->
+  <div id="chat-assistant-drawer" class="chat-drawer fixed bottom-20 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] h-[520px] bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden hidden">
+    <!-- Chat Header -->
+    <div class="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <h4 class="font-bold text-xs">Resume AI Assistant</h4>
+          <span class="text-[10px] text-indigo-100 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Context: Active Resume
+          </span>
+        </div>
+      </div>
+      <button id="btn-close-chat" class="p-1 rounded-lg hover:bg-white/10 text-white/80 hover:text-white">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Quick Question Chips -->
+    <div class="p-3 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 flex gap-1.5 overflow-x-auto text-[11px] font-medium shrink-0">
+      <button class="chat-quick-chip px-2.5 py-1 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0 hover:border-indigo-500 transition">
+        Improve project bullet points
+      </button>
+      <button class="chat-quick-chip px-2.5 py-1 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0 hover:border-indigo-500 transition">
+        What skills to highlight?
+      </button>
+      <button class="chat-quick-chip px-2.5 py-1 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0 hover:border-indigo-500 transition">
+        Write summary for Google
+      </button>
+    </div>
+
+    <!-- Chat Messages Scroll Area -->
+    <div id="chat-messages-container" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs">
+      <!-- Initial AI Greeting Bubble -->
+      <div class="flex gap-2.5 items-start">
+        <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
+          <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+        </div>
+        <div class="p-3 rounded-2xl rounded-tl-sm bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 leading-relaxed max-w-[85%]">
+          Hi! I'm your Resume AI Assistant. I can help rewrite your project descriptions with strong action verbs, explain your ATS score, or suggest how to highlight your skills for your target role!
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Input Form -->
+    <form id="form-chat" class="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center gap-2 shrink-0">
+      <input type="text" id="chat-input" placeholder="Ask anything about your resume..." class="flex-1 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border-0 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+      <button type="submit" class="p-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition">
+        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+      </button>
+    </form>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- Footer (Visible on Landing Page) -->
+  <footer id="global-footer" class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
+      <div class="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300">
+        <div class="w-5 h-5 rounded-md bg-indigo-600 flex items-center justify-center text-white">
+          <i data-lucide="sparkles" class="w-3 h-3"></i>
+        </div>
+        <span>ResumeForge AI • Production Grade Resume Platform</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <button class="hover:text-indigo-600 transition" onclick="app.openLegalModal()">Privacy Policy</button>
+        <button class="hover:text-indigo-600 transition" onclick="app.openLegalModal()">Terms of Service</button>
+        <span>© 2026 ResumeForge AI</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript App Entrypoint (ES Module) -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
